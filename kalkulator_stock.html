@@ -1,0 +1,802 @@
+<html lang="id">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#d4af37">
+  <link rel="apple-touch-icon" href="logo-192.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalkulator Stock Coil KOBA</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Inter & Futuristic Display Fonts for Robofan Free Style -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Orbitron:wght@700;800;900&family=Tektur:wght@700;800;900&family=Russo+One&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    @font-face {
+      font-family: 'Robofan Free';
+      src: local('Robofan Free'), local('Robofan-Free'), local('Robofan');
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #4a0404 0%, #700000 50%, #2b0000 100%);
+      min-height: 100vh;
+    }
+
+    .robofan-font {
+      font-family: 'Robofan Free', 'Tektur', 'Orbitron', 'Russo One', sans-serif;
+      letter-spacing: 0.05em;
+    }
+
+    .gold-border {
+      border: 1.5px solid #d4af37;
+    }
+
+    .gold-text {
+      background: linear-gradient(180deg, #fff2a3 0%, #d4af37 60%, #aa7c11 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .silver-card {
+      background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+      border: 1.5px solid #d4af37;
+      box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.4), 0 8px 15px -6px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Custom styling for width selection buttons */
+    .btn-width-active {
+      background-color: #700000;
+      color: #ffffff;
+      border-color: #d4af37;
+      box-shadow: 0 4px 10px rgba(112, 0, 0, 0.3);
+    }
+
+    .btn-width-inactive {
+      background-color: #f3f4f6;
+      color: #374151;
+      border-color: #d1d5db;
+    }
+
+    .btn-width-inactive:hover {
+      background-color: #e5e7eb;
+      color: #111827;
+    }
+  </style>
+</head>
+<body class="p-3 md:p-6 text-gray-800">
+
+  <div class="max-w-4xl mx-auto space-y-6">
+
+    <!-- Header Aplikasi -->
+    <header class="text-center mb-2 flex flex-col items-center">
+      <!-- Logo Tulisan KOBA (Diatas Judul) -->
+      <div class="mb-1 bg-black border-2 border-amber-400 px-5 py-1.5 rounded-2xl shadow-xl inline-flex items-center justify-center">
+        <span class="robofan-font gold-text text-3xl md:text-4xl font-black uppercase tracking-wider drop-shadow-md">
+          KOBA
+        </span>
+      </div>
+
+      <!-- Judul Aplikasi -->
+      <h1 class="robofan-font text-2xl md:text-3xl font-black tracking-wide uppercase gold-text drop-shadow-md mt-1">
+        KALKULATOR STOCK COIL
+      </h1>
+      <p class="text-xs md:text-sm text-amber-200/90 font-medium tracking-wide mt-1">
+        Sistem Perhitungan Stock, Fisik Coil & Estimasi Order Atap
+      </p>
+    </header>
+
+    <!-- Kartu Utama Aplikasi -->
+    <div class="silver-card rounded-2xl p-4 md:p-6 space-y-8">
+
+      <!-- SECTION 1: KONVERSI CEPAT -->
+      <section>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b-2 border-amber-500 pb-2 mb-4 gap-2">
+          <h2 class="text-base md:text-lg font-extrabold text-red-950 flex items-center gap-2">
+            <span class="w-3 h-3 bg-red-800 rounded-full inline-block"></span>
+            1. Konversi Cepat Stock Coil
+          </h2>
+
+          <!-- Pilihan Lebar Roll Coil (914 / 1219) -->
+          <div class="flex items-center gap-2 bg-amber-50 border border-amber-300 p-1 rounded-xl">
+            <span class="text-xs font-bold text-amber-900 px-1">Lebar Roll:</span>
+            <button type="button" onclick="setKonversiWidth(1219)" id="btn_kc_1219" 
+                    class="btn-width-active text-xs font-extrabold px-3 py-1 rounded-lg border transition-all flex items-center gap-1">
+              <span>1219 mm</span>
+              <span class="bg-amber-400 text-red-950 text-[9px] px-1 rounded font-black">Standar</span>
+            </button>
+            <button type="button" onclick="setKonversiWidth(914)" id="btn_kc_914" 
+                    class="btn-width-inactive text-xs font-extrabold px-3 py-1 rounded-lg border transition-all">
+              914 mm
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Hitung Panjang -->
+          <div class="bg-white p-4 rounded-xl border border-amber-200 shadow-sm space-y-3">
+            <div class="flex justify-between items-center border-b pb-2">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-600">Mencari Panjang dari Weight</h3>
+              <span id="kc_factor_badge1" class="text-[10px] bg-red-100 text-red-800 px-2 py-0.5 rounded-full font-bold">Faktor: 100</span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">Stock (Ton)</label>
+                <input type="number" id="stockTon" value=" " step="0.1" min="0" oninput="hitungPanjang()" 
+                       class="w-full p-2 border border-gray-300 rounded-lg text-red-700 font-bold focus:ring-2 focus:ring-red-800 outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">Tebal BMT (mm)</label>
+                <input type="number" id="tebalBmt1" value="0.20" step="0.05" min="0.05" oninput="hitungPanjang()" 
+                       class="w-full p-2 border border-gray-300 rounded-lg text-red-700 font-bold focus:ring-2 focus:ring-red-800 outline-none">
+              </div>
+            </div>
+
+            <div class="pt-2 border-t text-center bg-amber-50/60 p-2 rounded-lg border border-amber-200">
+              <span class="text-xs text-amber-900 font-medium">Estimasi Ketersediaan Panjang:</span>
+              <div class="text-2xl font-black text-gray-900">
+                &plusmn; <span id="resPanjang">500</span> <span class="text-sm font-normal text-gray-600">m¹</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hitung Berat -->
+          <div class="bg-white p-4 rounded-xl border border-amber-200 shadow-sm space-y-3">
+            <div class="flex justify-between items-center border-b pb-2">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-600">Mencari Berat dari Volume</h3>
+              <span id="kc_factor_badge2" class="text-[10px] bg-red-100 text-red-800 px-2 py-0.5 rounded-full font-bold">Faktor: 100</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">Volume (m¹)</label>
+                <input type="number" id="volumeMeter" value=" " step="1" min="0" oninput="hitungKebutuhan()" 
+                       class="w-full p-2 border border-gray-300 rounded-lg text-red-700 font-bold focus:ring-2 focus:ring-red-800 outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">Tebal BMT (mm)</label>
+                <input type="number" id="tebalBmt2" value="0.20" step="0.05" min="0.05" oninput="hitungKebutuhan()" 
+                       class="w-full p-2 border border-gray-300 rounded-lg text-red-700 font-bold focus:ring-2 focus:ring-red-800 outline-none">
+              </div>
+            </div>
+
+            <div class="pt-2 border-t text-center bg-amber-50/60 p-2 rounded-lg border border-amber-200">
+              <span class="text-xs text-amber-900 font-medium">Estimasi Kebutuhan Stock:</span>
+              <div class="text-2xl font-black text-gray-900">
+                &plusmn; <span id="resKebutuhan">1,000</span> <span class="text-sm font-normal text-gray-600">Ton</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 2: DETAIL FISIK MATERIAL -->
+      <section>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b-2 border-amber-500 pb-2 mb-4 gap-2">
+          <h2 class="text-base md:text-lg font-extrabold text-red-950 flex items-center gap-2">
+            <span class="w-3 h-3 bg-red-800 rounded-full inline-block"></span>
+            2. Detail Fisik Material & Dimensi Coil
+          </h2>
+
+          <!-- Mode Perhitungan Fisik -->
+          <div class="flex items-center gap-2 bg-red-100 border border-red-300 p-1 rounded-xl text-xs font-bold text-red-950">
+            <span>Metode:</span>
+            <select id="fisikCalcMode" onchange="toggleFisikMode()" class="bg-white border border-red-300 text-red-900 rounded-lg p-1 outline-none font-bold text-xs">
+              <option value="berat">Berat Stock Diketahui (Input Ton)</option>
+              <option value="od">Berat Tidak Diketahui (Input OD mm)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 md:p-5 rounded-xl border border-amber-200 space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+            
+            <!-- Massa Jenis Material (Fixed) -->
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">Massa Jenis Steel</label>
+              <input type="text" value="7,85 g/cm³" readonly disabled 
+                     class="w-full p-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-500 font-bold cursor-not-allowed text-center text-xs">
+            </div>
+
+            <!-- Lebar Strip Coil (Pilihan 914 / 1219) -->
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">
+                Lebar Strip Coil
+              </label>
+              <div class="grid grid-cols-2 gap-1.5">
+                <button type="button" onclick="setFisikWidth(1219)" id="btn_pf_1219" 
+                        class="btn-width-active py-2 px-2 rounded-lg border font-bold text-xs transition-all flex items-center justify-center gap-1">
+                  <span>1219 mm</span>
+                </button>
+                <button type="button" onclick="setFisikWidth(914)" id="btn_pf_914" 
+                        class="btn-width-inactive py-2 px-2 rounded-lg border font-bold text-xs transition-all flex items-center justify-center gap-1">
+                  <span>914 mm</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Diameter Dalam / ID (Standar 508, Large 610, Custom) -->
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">Diameter Dalam / ID</label>
+              <select id="idCoil" onchange="handleIdChange()" 
+                      class="w-full p-2 border border-gray-300 rounded-lg text-red-700 font-bold focus:ring-2 focus:ring-red-800 outline-none bg-white text-xs">
+                <option value="508" selected>Standar 508 mm</option>
+                <option value="610">Large 610 mm</option>
+                <option value="custom">Custom (Isi Sendiri)</option>
+              </select>
+              <!-- Input Custom ID (Tampil jika Custom dipilih) -->
+              <div id="customIdContainer" class="hidden mt-2">
+                <input type="number" id="customIdMm" value="500" min="100" max="1500" oninput="hitungDetailFisik()" 
+                       placeholder="Input ID (mm)" class="w-full p-1.5 border border-amber-400 rounded-lg text-xs font-bold text-red-800">
+              </div>
+            </div>
+
+            <!-- Outer Diameter OD Input (Aktif jika Mode OD dipilih / Disabled jika Mode Berat) -->
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1 flex items-center justify-between">
+                <span>Diameter Luar / OD</span>
+                <span id="odInputBadge" class="text-[9px] bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded font-bold">Auto</span>
+              </label>
+              <input type="number" id="inputOdMm" value="1120" min="100" max="3000" step="1" oninput="hitungDetailFisik()" disabled
+                     class="w-full p-2 border border-gray-300 rounded-lg text-red-700 font-bold focus:ring-2 focus:ring-red-800 outline-none bg-gray-100 text-xs cursor-not-allowed">
+            </div>
+
+          </div>
+
+          <!-- Hasil Perhitungan Fisik Geometri Gulungan (OD, Estimasi Panjang Roll, Berat) -->
+          <div class="pt-3 border-t border-gray-200 space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-red-950 text-white p-3.5 rounded-xl">
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-amber-500 text-red-950 rounded-lg font-black text-xs">OD</div>
+                <div>
+                  <span class="text-[10px] text-amber-200 block uppercase font-medium">Outer Diameter (OD)</span>
+                  <span class="text-base font-black text-white">&plusmn; <span id="res_od_mm">1120</span> mm</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-amber-500 text-red-950 rounded-lg font-black text-xs">PANJANG</div>
+                <div>
+                  <span class="text-[10px] text-amber-200 block uppercase font-medium">Estimasi Panjang Roll</span>
+                  <span class="text-base font-black text-white">&plusmn; <span id="res_panjang_roll">500</span> m¹</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-amber-500 text-red-950 rounded-lg font-black text-xs">BERAT</div>
+                <div>
+                  <span class="text-[10px] text-amber-200 block uppercase font-medium">Estimasi Berat Coil</span>
+                  <span class="text-base font-black text-white">&plusmn; <span id="res_berat_ton">1,000</span> Ton</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel Keamanan Produksi (-4.5%) & Keterangan Note -->
+            <div class="bg-amber-50 border border-amber-300 rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs">
+              <div class="flex items-center gap-2.5 text-amber-950">
+                <div class="p-1.5 bg-amber-200 rounded-lg text-amber-900 flex-shrink-0">
+                  <i data-lucide="shield-check" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <span class="font-extrabold block text-amber-950 text-xs sm:text-sm">Batas Keamanan Produksi:</span>
+                  <p class="text-[11px] text-amber-800 font-medium leading-relaxed">
+                    Untuk keamanan produksi, hasil estimasi panjang dikurangi 4,3% 
+                    <span class="block text-[10px] text-amber-700 italic mt-0.5"></span>
+                  </p>
+                </div>
+              </div>
+              <div class="bg-amber-100 border border-amber-400 px-3.5 py-2 rounded-lg text-amber-950 self-stretch sm:self-auto text-center shadow-sm flex flex-col justify-center min-w-[140px]">
+                <span class="text-[9px] uppercase font-bold text-amber-800 tracking-wider">Panjang Aman:</span>
+                <span class="font-black text-base text-red-900">&plusmn; <span id="res_panjang_aman">477,5</span> m¹</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SECTION 3: ESTIMASI ORDER ATAP -->
+      <section>
+        <div class="flex justify-between items-center border-b-2 border-amber-500 pb-2 mb-4">
+          <h2 class="text-base md:text-lg font-extrabold text-red-950 flex items-center gap-2">
+            <span class="w-3 h-3 bg-red-800 rounded-full inline-block"></span>
+            3. Estimasi Order Atap
+          </h2>
+          <button onclick="tambahBarisOrder()" 
+                  class="bg-red-800 hover:bg-red-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i> Tambah Item
+          </button>
+        </div>
+
+        <!-- Panel Pilihan Ketersediaan Stock / Berat Tersedia -->
+        <div class="bg-amber-50/90 p-3.5 rounded-xl border border-amber-300 mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+          <div>
+            <label class="block text-xs font-bold text-red-950 flex items-center gap-1.5">
+              <i data-lucide="scale" class="w-4 h-4 text-amber-700"></i>
+              Ketersediaan Stock / Berat Tersedia
+            </label>
+            <p class="text-[11px] text-gray-600 font-medium">Pilih sumber data ketersediaan stock untuk kalkulasi pemakaian atap</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            <!-- Mode Selector Dropdown -->
+            <select id="orderStockMode" onchange="toggleOrderStockMode()" 
+                    class="bg-white border border-amber-400 text-red-950 rounded-lg p-1.5 outline-none font-extrabold text-xs shadow-sm focus:ring-2 focus:ring-red-800">
+              <option value="auto" selected>1. Otomatis (Step Sebelumnya)</option>
+              <option value="manual">2. Input Manual (Bebas)</option>
+            </select>
+
+            <!-- Input Berat Stock Tersedia -->
+            <div class="relative flex-1 sm:w-36">
+              <input type="number" id="inputStockOrderTon" value="1.0" step="0.1" min="0" oninput="hitungSummaryOrder()" 
+                     class="w-full p-1.5 pr-10 border border-gray-300 rounded-lg text-red-800 font-black text-xs text-right focus:ring-2 focus:ring-red-800 outline-none bg-gray-100 cursor-not-allowed" disabled>
+              <span class="absolute right-2 top-1.5 text-xs text-gray-500 font-bold pointer-events-none">Ton</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left border-collapse">
+            <thead>
+              <tr class="bg-red-900 text-white text-xs uppercase">
+                <th class="p-2.5 border border-red-950">Panjang (m)</th>
+                <th class="p-2.5 border border-red-950 text-center">Jumlah (Lbr)</th>
+                <th class="p-2.5 border border-red-950 text-center">Total Meter</th>
+                <th class="p-2.5 border border-red-950 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="bodyOrder">
+              <!-- Item rows created dynamically by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Ringkasan Order -->
+        <div class="mt-4 bg-amber-50 p-3.5 rounded-xl border border-amber-300 grid grid-cols-2 sm:grid-cols-3 gap-3 text-center">
+          <div>
+            <span class="text-[10px] uppercase font-bold text-gray-500 block">Total Kebutuhan</span>
+            <span class="text-base font-black text-gray-900"><span id="summary_total_m">0</span> m¹</span>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase font-bold text-gray-500 block">Estimasi Berat Terpakai</span>
+            <span class="text-base font-black text-red-800"><span id="summary_total_ton">0,000</span> Ton</span>
+          </div>
+          <div class="col-span-2 sm:col-span-1">
+            <span class="text-[10px] uppercase font-bold text-gray-500 block">Sisa Stock Coil</span>
+            <span class="text-base font-black text-emerald-700"><span id="summary_sisa_ton">1,000</span> Ton</span>
+          </div>
+        </div>
+
+        <!-- Banner Keterangan Status Stock (Cukup / Kurang) -->
+        <div id="statusStockBanner" class="mt-4 p-4 rounded-xl border-2 flex items-center justify-between gap-3 shadow-md transition-all">
+          <div class="flex items-center gap-3">
+            <div id="statusStockIcon" class="p-2 rounded-xl text-white font-black text-xl flex items-center justify-center">
+              <i data-lucide="check-circle" class="w-7 h-7"></i>
+            </div>
+            <div>
+              <h3 id="statusStockTitle" class="text-base font-black uppercase tracking-wide">
+                STOCK CUKUP
+              </h3>
+              <p id="statusStockDesc" class="text-xs font-medium mt-0.5">
+                Ketersediaan stock coil mencukupi untuk memenuhi estimasi order atap ini.
+              </p>
+            </div>
+          </div>
+          <div id="statusStockBadge" class="hidden sm:block text-xs font-black px-3 py-1.5 rounded-lg border uppercase tracking-wider">
+            AMAN
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center text-xs text-amber-200/80 py-2 font-medium">
+      &copy; 2026 Kalkulator Stock Coil KOBA. All rights reserved.
+    </footer>
+  </div>
+
+  <script>
+    // Global State
+    let konversiWidth = 1219; // Default 1219 mm
+    let fisikWidth = 1219;    // Default 1219 mm
+    const DENSITY_STEEL = 7.85; // g/cm3 fixed
+
+    // Helper: Format Indonesian Comma Number
+    function formatKoma(num, decimals = 3) {
+      if (isNaN(num) || num === null) return '0';
+      return num.toLocaleString('id-ID', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      });
+    }
+
+    // Get Length Factor based on Width
+    // Formula: 1219mm -> 100 factor. 914mm coil produces ~1.333x longer meters per Ton.
+    function getFactor(width) {
+      return width === 914 ? (100 * 1219 / 914) : 100;
+    }
+
+    // Get auto stock tonnage from step 1 or step 2 depending on physical mode
+    function getAutoStockTon() {
+      const fisikMode = document.getElementById('fisikCalcMode').value;
+      if (fisikMode === 'od') {
+        const odText = document.getElementById('res_berat_ton').innerText;
+        const cleanNum = odText.replace(/\./g, '').replace(',', '.');
+        return parseFloat(cleanNum) || 0;
+      } else {
+        return parseFloat(document.getElementById('stockTon').value) || 0;
+      }
+    }
+
+    // Update auto stock order input if auto mode is selected
+    function updateAutoStockOrder() {
+      const modeSelect = document.getElementById('orderStockMode');
+      if (!modeSelect) return;
+      
+      const mode = modeSelect.value;
+      if (mode === 'auto') {
+        const autoTon = getAutoStockTon();
+        const inputOrder = document.getElementById('inputStockOrderTon');
+        if (inputOrder) {
+          inputOrder.value = autoTon > 0 ? autoTon.toFixed(3) : '0';
+        }
+      }
+    }
+
+    // Toggle Mode Berat Tersedia pada Section 3 (Estimasi Order)
+    function toggleOrderStockMode() {
+      const mode = document.getElementById('orderStockMode').value;
+      const input = document.getElementById('inputStockOrderTon');
+      if (mode === 'manual') {
+        input.disabled = false;
+        input.classList.remove('bg-gray-100', 'cursor-not-allowed');
+        input.classList.add('bg-white');
+      } else {
+        input.disabled = true;
+        input.classList.add('bg-gray-100', 'cursor-not-allowed');
+        input.classList.remove('bg-white');
+        updateAutoStockOrder();
+      }
+      hitungSummaryOrder();
+    }
+
+    // Toggle Width for Konversi Cepat
+    function setKonversiWidth(width) {
+      konversiWidth = width;
+      const btn1219 = document.getElementById('btn_kc_1219');
+      const btn914 = document.getElementById('btn_kc_914');
+      const factorBadge1 = document.getElementById('kc_factor_badge1');
+      const factorBadge2 = document.getElementById('kc_factor_badge2');
+
+      if (width === 1219) {
+        btn1219.className = 'btn-width-active text-xs font-extrabold px-3 py-1 rounded-lg border transition-all flex items-center gap-1';
+        btn914.className = 'btn-width-inactive text-xs font-extrabold px-3 py-1 rounded-lg border transition-all';
+        factorBadge1.innerText = 'Faktor: 100';
+        factorBadge2.innerText = 'Faktor: 100';
+      } else {
+        btn914.className = 'btn-width-active text-xs font-extrabold px-3 py-1 rounded-lg border transition-all flex items-center gap-1';
+        btn1219.className = 'btn-width-inactive text-xs font-extrabold px-3 py-1 rounded-lg border transition-all';
+        factorBadge1.innerText = 'Faktor: 133.3';
+        factorBadge2.innerText = 'Faktor: 133.3';
+      }
+
+      hitungPanjang();
+      hitungKebutuhan();
+    }
+
+    // Toggle Width for Detail Fisik
+    function setFisikWidth(width) {
+      fisikWidth = width;
+      const btn1219 = document.getElementById('btn_pf_1219');
+      const btn914 = document.getElementById('btn_pf_914');
+
+      if (width === 1219) {
+        btn1219.className = 'btn-width-active py-2 px-2 rounded-lg border font-bold text-xs transition-all flex items-center justify-center gap-1';
+        btn914.className = 'btn-width-inactive py-2 px-2 rounded-lg border font-bold text-xs transition-all flex items-center justify-center gap-1';
+      } else {
+        btn914.className = 'btn-width-active py-2 px-2 rounded-lg border font-bold text-xs transition-all flex items-center justify-center gap-1';
+        btn1219.className = 'btn-width-inactive py-2 px-2 rounded-lg border font-bold text-xs transition-all flex items-center justify-center gap-1';
+      }
+
+      hitungDetailFisik();
+    }
+
+    // Handle ID Dropdown Selection (508 / 610 / Custom)
+    function handleIdChange() {
+      const select = document.getElementById('idCoil');
+      const customContainer = document.getElementById('customIdContainer');
+      if (select.value === 'custom') {
+        customContainer.classList.remove('hidden');
+      } else {
+        customContainer.classList.add('hidden');
+      }
+      hitungDetailFisik();
+    }
+
+    // Get Active ID Value
+    function getSelectedIdMm() {
+      const select = document.getElementById('idCoil');
+      if (select.value === 'custom') {
+        return parseFloat(document.getElementById('customIdMm').value) || 500;
+      }
+      return parseFloat(select.value) || 508;
+    }
+
+    // Toggle Calculation Mode (Berat Known vs OD Known)
+    function toggleFisikMode() {
+      const mode = document.getElementById('fisikCalcMode').value;
+      const odInput = document.getElementById('inputOdMm');
+      const odBadge = document.getElementById('odInputBadge');
+
+      if (mode === 'od') {
+        odInput.disabled = false;
+        odInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
+        odInput.classList.add('bg-white');
+        odBadge.innerText = 'Input';
+        odBadge.className = 'text-[9px] bg-red-800 text-white px-1.5 py-0.5 rounded font-bold';
+      } else {
+        odInput.disabled = true;
+        odInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+        odInput.classList.remove('bg-white');
+        odBadge.innerText = 'Auto';
+        odBadge.className = 'text-[9px] bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded font-bold';
+      }
+
+      hitungDetailFisik();
+    }
+
+    // 1. Hitung Panjang dari Weight
+    function hitungPanjang() {
+      const stock = parseFloat(document.getElementById('stockTon').value) || 0;
+      const bmt = parseFloat(document.getElementById('tebalBmt1').value) || 0;
+      const factor = getFactor(konversiWidth);
+
+      if (bmt > 0) {
+        const panjang = (stock * factor) / bmt;
+        document.getElementById('resPanjang').innerText = Math.round(panjang).toLocaleString('id-ID');
+      } else {
+        document.getElementById('resPanjang').innerText = '0';
+      }
+
+      hitungDetailFisik();
+      updateAutoStockOrder();
+      hitungSummaryOrder();
+    }
+
+    // 2. Hitung Kebutuhan Berat dari Volume
+    function hitungKebutuhan() {
+      const volume = parseFloat(document.getElementById('volumeMeter').value) || 0;
+      const bmt = parseFloat(document.getElementById('tebalBmt2').value) || 0;
+      const factor = getFactor(konversiWidth);
+
+      if (bmt > 0) {
+        const kebutuhan = (volume * bmt) / factor;
+        document.getElementById('resKebutuhan').innerText = formatKoma(kebutuhan, 3);
+      } else {
+        document.getElementById('resKebutuhan').innerText = '0,000';
+      }
+
+      hitungSummaryOrder();
+    }
+
+    // 3. Hitung Detail Fisik Dimensi Coil (OD, Estimasi Panjang Roll, & Berat)
+    function hitungDetailFisik() {
+      const mode = document.getElementById('fisikCalcMode').value;
+      const bmt = parseFloat(document.getElementById('tebalBmt1').value) || 0.20;
+      const idMm = getSelectedIdMm();
+      const widthMm = fisikWidth;
+
+      if (mode === 'berat') {
+        // MODE 1: Berat Diketahui -> Hitung OD & Total Panjang
+        const stockTon = parseFloat(document.getElementById('stockTon').value) || 0;
+        const weightKg = stockTon * 1000;
+
+        if (bmt > 0 && widthMm > 0 && weightKg > 0) {
+          const lengthM = weightKg / ((widthMm / 1000) * bmt * DENSITY_STEEL);
+          const idM = idMm / 1000;
+          const bmtM = bmt / 1000;
+          const area = lengthM * bmtM;
+          const odM = Math.sqrt((4 * area / Math.PI) + (idM * idM));
+          const odMm = odM * 1000;
+          const lengthAmanM = lengthM * (1 - 0.043); // Safety margin -4.3%
+
+          document.getElementById('inputOdMm').value = Math.round(odMm);
+          document.getElementById('res_od_mm').innerText = Math.round(odMm);
+          document.getElementById('res_panjang_roll').innerText = Math.round(lengthM).toLocaleString('id-ID');
+          document.getElementById('res_panjang_aman').innerText = formatKoma(lengthAmanM, 1);
+          document.getElementById('res_berat_ton').innerText = formatKoma(stockTon, 3);
+        } else {
+          document.getElementById('res_od_mm').innerText = '0';
+          document.getElementById('res_panjang_roll').innerText = '0';
+          document.getElementById('res_panjang_aman').innerText = '0,0';
+          document.getElementById('res_berat_ton').innerText = '0,000';
+        }
+      } else {
+        // MODE 2: Berat Tidak Diketahui -> Input OD -> Hitung Panjang & Berat
+        const odMm = parseFloat(document.getElementById('inputOdMm').value) || 0;
+
+        if (odMm > idMm && bmt > 0 && widthMm > 0) {
+          // Cross sectional area of coil (mm2)
+          const areaMm2 = (Math.PI / 4) * (Math.pow(odMm, 2) - Math.pow(idMm, 2));
+          // Total length (m) = area (mm2) / (bmt mm * 1000)
+          const lengthM = areaMm2 / (bmt * 1000);
+          // Weight (Ton) = length (m) * width (m) * bmt (mm) * 7.85 / 1000
+          const weightTon = (lengthM * (widthMm / 1000) * bmt * DENSITY_STEEL) / 1000;
+          const lengthAmanM = lengthM * (1 - 0.043); // Safety margin -4.3%
+
+          document.getElementById('res_od_mm').innerText = Math.round(odMm);
+          document.getElementById('res_panjang_roll').innerText = Math.round(lengthM).toLocaleString('id-ID');
+          document.getElementById('res_panjang_aman').innerText = formatKoma(lengthAmanM, 1);
+          document.getElementById('res_berat_ton').innerText = formatKoma(weightTon, 3);
+        } else {
+          document.getElementById('res_od_mm').innerText = Math.round(odMm);
+          document.getElementById('res_panjang_roll').innerText = '0';
+          document.getElementById('res_panjang_aman').innerText = '0,0';
+          document.getElementById('res_berat_ton').innerText = '0,000';
+        }
+      }
+
+      updateAutoStockOrder();
+    }
+
+    // 4. Estimasi Order Table Logic
+    function tambahBarisOrder(panjang = 6, jumlah = 10) {
+      const tbody = document.getElementById('bodyOrder');
+      const tr = document.createElement('tr');
+      tr.className = "hover:bg-amber-50 transition border-b border-gray-200 bg-white";
+      
+      tr.innerHTML = `
+        <td class="p-2 border">
+          <input type="number" value="${panjang}" step="0.1" min="0" oninput="updateRow(this)" 
+                 class="w-full p-1.5 border rounded text-center font-bold text-red-800 focus:ring-2 focus:ring-red-800 outline-none">
+        </td>
+        <td class="p-2 border">
+          <input type="number" value="${jumlah}" step="1" min="1" oninput="updateRow(this)" 
+                 class="w-full p-1.5 border rounded text-center font-bold text-gray-900 focus:ring-2 focus:ring-red-800 outline-none">
+        </td>
+        <td class="p-2 border font-bold text-gray-800 text-center total-m">
+          ${(panjang * jumlah).toFixed(1)} m¹
+        </td>
+        <td class="p-2 border text-center space-x-1">
+          <button onclick="duplikatBaris(this)" title="Duplikat Item" class="bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded text-xs font-bold transition">
+            📋
+          </button>
+          <button onclick="hapusBaris(this)" title="Hapus Item" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs font-bold transition">
+            🗑️
+          </button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+      hitungSummaryOrder();
+    }
+
+    function updateRow(input) {
+      const tr = input.closest('tr');
+      const inputs = tr.querySelectorAll('input[type="number"]');
+      const p = parseFloat(inputs[0].value) || 0;
+      const j = parseFloat(inputs[1].value) || 0;
+      tr.querySelector('.total-m').innerText = (p * j).toFixed(1) + ' m¹';
+      hitungSummaryOrder();
+    }
+
+    function duplikatBaris(btn) {
+      const tr = btn.closest('tr');
+      const inputs = tr.querySelectorAll('input[type="number"]');
+      tambahBarisOrder(inputs[0].value, inputs[1].value);
+    }
+
+    function hapusBaris(btn) {
+      const tbody = document.getElementById('bodyOrder');
+      if (tbody.querySelectorAll('tr').length > 1) {
+        const tr = btn.closest('tr');
+        tr.remove();
+        hitungSummaryOrder();
+      }
+    }
+
+    function hitungSummaryOrder() {
+      const rows = document.querySelectorAll('#bodyOrder tr');
+      let totalMeters = 0;
+
+      rows.forEach(tr => {
+        const inputs = tr.querySelectorAll('input[type="number"]');
+        if (inputs.length >= 2) {
+          const p = parseFloat(inputs[0].value) || 0;
+          const j = parseFloat(inputs[1].value) || 0;
+          totalMeters += (p * j);
+        }
+      });
+
+      const bmt = parseFloat(document.getElementById('tebalBmt1').value) || 0.20;
+      const factor = getFactor(konversiWidth);
+      
+      // Ambil nilai Ketersediaan Stock berdasarkan Mode yang dipilih (Otomatis / Input Manual)
+      const orderStockMode = document.getElementById('orderStockMode').value;
+      let stockAwalTon = 0;
+
+      if (orderStockMode === 'manual') {
+        stockAwalTon = parseFloat(document.getElementById('inputStockOrderTon').value) || 0;
+      } else {
+        stockAwalTon = getAutoStockTon();
+        document.getElementById('inputStockOrderTon').value = stockAwalTon.toFixed(3);
+      }
+
+      const totalTonTerpakai = (totalMeters * bmt) / factor;
+      const sisaStockTon = stockAwalTon - totalTonTerpakai;
+
+      document.getElementById('summary_total_m').innerText = totalMeters.toLocaleString('id-ID');
+      document.getElementById('summary_total_ton').innerText = formatKoma(totalTonTerpakai, 3);
+      document.getElementById('summary_sisa_ton').innerText = formatKoma(sisaStockTon, 3);
+
+      // Update Banner Keterangan Status Stock (Cukup / Kurang)
+      updateStatusStockBanner(sisaStockTon, totalTonTerpakai, stockAwalTon);
+    }
+
+    // Function Banner Keterangan Stock (Hijau / Merah)
+    function updateStatusStockBanner(sisaStock, totalTerpakai, stockAwal) {
+      const banner = document.getElementById('statusStockBanner');
+      const iconContainer = document.getElementById('statusStockIcon');
+      const title = document.getElementById('statusStockTitle');
+      const desc = document.getElementById('statusStockDesc');
+      const badge = document.getElementById('statusStockBadge');
+
+      if (sisaStock >= 0) {
+        // STOCK CUKUP (HIJAU)
+        banner.className = "mt-4 p-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-950 flex items-center justify-between gap-3 shadow-md transition-all";
+        iconContainer.className = "p-2.5 rounded-xl bg-emerald-600 text-white font-black text-xl flex items-center justify-center shadow-sm";
+        iconContainer.innerHTML = `<i data-lucide="check-circle-2" class="w-7 h-7"></i>`;
+        title.className = "text-base font-black uppercase tracking-wide text-emerald-900";
+        title.innerText = "STOCK CUKUP";
+        desc.className = "text-xs font-semibold text-emerald-800 mt-0.5";
+        desc.innerText = `Ketersediaan stock coil mencukupi order. Sisa stock akhir: +${formatKoma(sisaStock, 3)} Ton.`;
+        badge.className = "hidden sm:block text-xs font-black px-3 py-1.5 rounded-lg border border-emerald-400 bg-emerald-200 text-emerald-900 uppercase tracking-wider shadow-sm";
+        badge.innerText = "STOCK CUKUP";
+      } else {
+        // STOCK KURANG (MERAH)
+        const defisit = Math.abs(sisaStock);
+        banner.className = "mt-4 p-4 rounded-xl border-2 border-red-500 bg-red-50 text-red-950 flex items-center justify-between gap-3 shadow-md transition-all animate-pulse";
+        iconContainer.className = "p-2.5 rounded-xl bg-red-600 text-white font-black text-xl flex items-center justify-center shadow-sm";
+        iconContainer.innerHTML = `<i data-lucide="alert-triangle" class="w-7 h-7"></i>`;
+        title.className = "text-base font-black uppercase tracking-wide text-red-900";
+        title.innerText = "STOCK KURANG";
+        desc.className = "text-xs font-semibold text-red-800 mt-0.5";
+        desc.innerText = `Stock coil tidak mencukupi! Kurang / Defisit sebanyak: ${formatKoma(defisit, 3)} Ton dari stock awal.`;
+        badge.className = "hidden sm:block text-xs font-black px-3 py-1.5 rounded-lg border border-red-400 bg-red-200 text-red-950 uppercase tracking-wider shadow-sm";
+        badge.innerText = "STOCK KURANG";
+      }
+
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+    }
+
+    // Initialization on Page Load
+    window.onload = function() {
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+      setKonversiWidth(1219);
+      setFisikWidth(1219);
+      tambahBarisOrder(6, 10);
+      toggleOrderStockMode();
+    };
+  </script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(() => console.log('Service Worker Terdaftar (Siap Offline)'))
+        .catch((err) => console.log('Gagal mendaftarkan SW:', err));
+    });
+  }
+  </script>
+</body>
+</html>
